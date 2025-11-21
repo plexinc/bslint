@@ -79,28 +79,32 @@ describe('getLineOffsets', () => {
 
 describe('applyEdits', () => {
     it('Edits in the right order', () => {
-        const newSrc = applyEdits(
-            'line 1\nline 2', [{
-                range: Range.create(0, 0, 0, 6),
-                text: 'replaced line 1!'
-            }, {
-                range: Range.create(1, 5, 1, 6),
-                text: '(2)'
-            }]
-        );
+        const edits = [
+            {
+                diagnostic: { code: 0, message: 'dummy' } as any,
+                changes: [
+                    { range: Range.create(0, 0, 0, 6), text: 'replaced line 1!' },
+                    { range: Range.create(1, 5, 1, 6), text: '(2)' }
+                ]
+            }
+        ];
+
+        const { newSrc } = applyEdits('line 1\nline 2', edits);
         expect(newSrc).equals('replaced line 1!\nline (2)');
     });
 
     it('Edits in the reverse order', () => {
-        const newSrc = applyEdits(
-            'line 1\nline 2', [{
-                range: Range.create(1, 5, 1, 6),
-                text: '(2)'
-            }, {
-                range: Range.create(0, 0, 0, 6),
-                text: 'replaced line 1!'
-            }]
-        );
+        const edits = [
+            {
+                diagnostic: { code: 0, message: 'dummy' } as any,
+                changes: [
+                    { range: Range.create(1, 5, 1, 6), text: '(2)' },
+                    { range: Range.create(0, 0, 0, 6), text: 'replaced line 1!' }
+                ]
+            }
+        ];
+
+        const { newSrc } = applyEdits('line 1\nline 2', edits);
         expect(newSrc).equals('replaced line 1!\nline (2)');
     });
 });

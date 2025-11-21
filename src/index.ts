@@ -57,6 +57,7 @@ export type BsLintConfig = Pick<BsConfig, 'project' | 'rootDir' | 'files' | 'cwd
     globals?: string[];
     ignores?: string[];
     fix?: boolean;
+    fixAll?: boolean;
     checkUsage?: boolean;
 };
 

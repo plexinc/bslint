@@ -59,7 +59,7 @@ export default class TrackCodeFlow {
 
     onGetCodeActions(event: OnGetCodeActionsEvent) {
         const addFixes = addFixesToEvent(event);
-        extractFixes(addFixes, event.diagnostics);
+        extractFixes(addFixes, event.diagnostics, this.lintContext.fixAll);
     }
 
     afterScopeValidate(scope: Scope, files: BscFile[], callables: CallableContainerMap) {
@@ -170,7 +170,7 @@ export default class TrackCodeFlow {
         });
 
         if (this.lintContext.fix) {
-            diagnostics = extractFixes(this.lintContext.addFixes, diagnostics);
+            diagnostics = extractFixes(this.lintContext.addFixes, diagnostics, this.lintContext.fixAll);
         }
 
         file.addDiagnostics(diagnostics);
