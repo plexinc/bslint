@@ -327,6 +327,10 @@ Running `bslint` with `--fix` parameter will attempt to fix common code-style is
 - Case sensitivity (align with first occurence)
 - Adding/removing newlines the end of non-empty files.
 
+Running `bslint` with `--fix-all` parameter will include all fixes from `--fix`, plus some advanced code changes:
+
+- Unused parameters (prefixed with `_`)
+
 ## Usage checking (approximative)
 
 Running `bslint` with `--checkUsage` parameter will attempt to identify unused components and scripts:

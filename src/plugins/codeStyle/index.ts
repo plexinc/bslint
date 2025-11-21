@@ -42,7 +42,7 @@ export default class CodeStyle {
 
     onGetCodeActions(event: OnGetCodeActionsEvent) {
         const addFixes = addFixesToEvent(event);
-        extractFixes(addFixes, event.diagnostics);
+        extractFixes(addFixes, event.diagnostics, this.lintContext.fixAll);
     }
 
     validateXMLFile(file: XmlFile) {
@@ -286,11 +286,9 @@ export default class CodeStyle {
             file
         }));
 
-        const { fix } = this.lintContext;
-
         // apply fix
-        if (fix) {
-            bsDiagnostics = extractFixes(this.lintContext.addFixes, bsDiagnostics);
+        if (this.lintContext.fix) {
+            bsDiagnostics = extractFixes(this.lintContext.addFixes, bsDiagnostics, this.lintContext.fixAll);
         }
 
         // append diagnostics

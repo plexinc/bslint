@@ -375,7 +375,12 @@ export function createVarLinter(
                     code: VarLintError.UnusedParameter,
                     message: `Parameter '${arg.name}' is set but value is never used`,
                     range: arg.range,
-                    file: file
+                    file: file,
+                    data: {
+                        name: arg.name,
+                        range: arg.range,
+                        isExperimental: true
+                    }
                 });
             }
         });
