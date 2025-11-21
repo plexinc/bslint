@@ -90,6 +90,7 @@ export function createVarLinter(
         };
         if (arg) {
             verifyVarCasing(arg, name);
+            arg.isUsed = true;
             return local;
         }
 
@@ -152,7 +153,7 @@ export function createVarLinter(
     function openBlock(block: StatementInfo) {
         const { stat } = block;
         if (isForStatement(stat)) {
-            // for iterator will be declared by the next assignement statement
+            // for iterator will be declared by the next assignment statement
         } else if (isForEachStatement(stat)) {
             // declare `for each` iterator variable
             setLocal(block, stat.item, VarRestriction.Iterator);
@@ -213,7 +214,8 @@ export function createVarLinter(
         const { locals, branches, returns } = closed;
         const { parent } = state;
         if (!locals || !parent) {
-            if (locals) {
+            // Finalize when there's no parent, i.e. end of function
+            if (!parent) {
                 finalize(locals);
             }
             return;
@@ -352,8 +354,8 @@ export function createVarLinter(
         return true;
     }
 
-    function finalize(locals: Map<string, VarInfo>) {
-        locals.forEach(local => {
+    function finalize(locals?: Map<string, VarInfo>) {
+        locals?.forEach(local => {
             if (!local.isUsed && !local.restriction) {
                 diagnostics.push({
                     severity: severity.unusedVariable,
@@ -365,7 +367,7 @@ export function createVarLinter(
             }
         });
 
-        args.forEach(arg => {
+        args?.forEach(arg => {
             // treat a leading underscore as an intentionally unused parameter
             if (!arg.isUsed && !arg.name.startsWith('_')) {
                 diagnostics.push({
