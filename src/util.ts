@@ -4,7 +4,7 @@ import { BsLintConfig, BsLintRules, RuleSeverity, BsLintSeverity } from './index
 import { readFileSync, existsSync } from 'fs';
 import * as path from 'path';
 import { Program, BscFile, DiagnosticSeverity } from 'brighterscript';
-import { applyFixes, ChangeEntry, TextEdit } from './textEdit';
+import { applyFixes, ChangeEntry } from './textEdit';
 import { addJob } from './Linter';
 
 export function getDefaultRules(): BsLintConfig['rules'] {
@@ -45,7 +45,11 @@ export function normalizeConfig(options: BsLintConfig) {
         rules: getDefaultRules()
     };
     const projectConfig = mergeConfigs(loadConfig(options), { rules: options.rules });
-    return mergeConfigs(baseConfig, projectConfig);
+    const result = mergeConfigs(baseConfig, projectConfig);
+    if (result.fixAll) {
+        result.fix = true;
+    }
+    return result;
 }
 
 export function mergeConfigs(a: BsLintConfig, b: BsLintConfig): BsLintConfig {
@@ -107,21 +111,22 @@ export interface PluginContext {
     globals: string[];
     ignores: (file: BscFile) => boolean;
     fix: Readonly<boolean>;
+    fixAll: Readonly<boolean>;
     checkUsage: Readonly<boolean>;
     addFixes: (file: BscFile, entry: ChangeEntry) => void;
 }
 
 export interface PluginWrapperContext extends PluginContext {
-    pendingFixes: Map<string, TextEdit[]>;
+    pendingFixes: Map<string, ChangeEntry[]>;
     applyFixes: () => Promise<void>;
 }
 
 export function createContext(program: Program): PluginWrapperContext {
-    const { rules, fix, checkUsage, globals, ignores } = normalizeConfig(program.options);
+    const { rules, fix, fixAll, checkUsage, globals, ignores } = normalizeConfig(program.options);
     const ignorePatterns = (ignores || []).map(pattern => {
         return pattern.startsWith('**/') ? pattern : '**/' + pattern;
     });
-    const pendingFixes = new Map<string, TextEdit[]>();
+    const pendingFixes = new Map<string, ChangeEntry[]>();
     return {
         program: program,
         severity: rulesToSeverity(rules),
@@ -131,12 +136,13 @@ export function createContext(program: Program): PluginWrapperContext {
             return !file || ignorePatterns.some(pattern => minimatch(file.pathAbsolute, pattern));
         },
         fix,
+        fixAll,
         checkUsage,
         addFixes: (file: BscFile, entry: ChangeEntry) => {
             if (!pendingFixes.has(file.pathAbsolute)) {
-                pendingFixes.set(file.pathAbsolute, entry.changes);
+                pendingFixes.set(file.pathAbsolute, [entry]);
             } else {
-                pendingFixes.get(file.pathAbsolute).push(...entry.changes);
+                pendingFixes.get(file.pathAbsolute).push(entry);
             }
         },
         applyFixes: () => addJob(applyFixes(fix, pendingFixes)),

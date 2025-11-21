@@ -18,7 +18,8 @@ const options = yargs
         description: 'Path to the root of your project files (where the manifest lives). Defaults to current directory.'
     })
     .option('lintConfig', { type: 'string', description: 'Path to a bslint.json configuration file.' })
-    .option('fix', { type: 'boolean', description: 'Fix automatically minor issues (experimental)' })
+    .option('fix', { type: 'boolean', description: 'Automatically fix minor issues (experimental)' })
+    .option('fix-all', { type: 'boolean', description: 'Automatically fix all issues, including advanced code changes (experimental)' })
     .option('checkUsage', { type: 'boolean', description: 'Look for potentially unused components and scripts' })
     .option('watch', { type: 'boolean', defaultDescription: 'false', description: 'Watch input files.' }).argv;
 
@@ -28,6 +29,7 @@ async function run(options: BsLintConfig) {
     }
     if (options.watch) {
         options.fix = false;
+        options.fixAll = false;
     }
     const config = normalizeConfig(options);
     const linter = new Linter();

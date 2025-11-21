@@ -357,8 +357,8 @@ describe('codeStyle', () => {
 
         function applyAllFixes(src: string, code: string): string {
             const diagnostics = program.getDiagnostics().filter(d => d.code === code);
-            const allChanges = diagnostics.flatMap(d => getFixes(d as any).changes);
-            return applyEdits(src, allChanges);
+            const entries = diagnostics.map(d => getFixes(d as any)).filter(Boolean);
+            return applyEdits(src, entries).newSrc;
         }
 
         it(`fix replaces 'next' with 'end for' under end-for mode`, () => {

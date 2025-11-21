@@ -44,7 +44,7 @@ export default class CodeStyle {
 
     onGetCodeActions(event: OnGetCodeActionsEvent) {
         const addFixes = addFixesToEvent(event);
-        extractFixes(addFixes, event.diagnostics);
+        extractFixes(addFixes, event.diagnostics, this.lintContext.fixAll);
 
         // For each fixable code touched by the cursor, offer "fix all" if there are
         // multiple occurrences of that code across the whole file
@@ -352,11 +352,9 @@ export default class CodeStyle {
             file
         }));
 
-        const { fix } = this.lintContext;
-
         // apply fix
-        if (fix) {
-            bsDiagnostics = extractFixes(this.lintContext.addFixes, bsDiagnostics);
+        if (this.lintContext.fix) {
+            bsDiagnostics = extractFixes(this.lintContext.addFixes, bsDiagnostics, this.lintContext.fixAll);
         }
 
         // append diagnostics

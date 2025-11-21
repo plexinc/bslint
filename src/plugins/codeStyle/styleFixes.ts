@@ -5,9 +5,13 @@ import { platform } from 'process';
 
 export function extractFixes(
     addFixes: (file: BscFile, changes: ChangeEntry) => void,
-    diagnostics: BsDiagnostic[]
+    diagnostics: BsDiagnostic[],
+    fixAll?: boolean
 ): BsDiagnostic[] {
     return diagnostics.filter(diagnostic => {
+        if (diagnostic.data?.isExperimental && !fixAll) {
+            return true;
+        }
         const fix = getFixes(diagnostic);
         if (fix) {
             addFixes(diagnostic.file, fix);
