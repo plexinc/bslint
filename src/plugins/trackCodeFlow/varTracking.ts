@@ -90,6 +90,7 @@ export function createVarLinter(
         };
         if (arg) {
             verifyVarCasing(arg, name);
+            arg.isUsed = true;
             return local;
         }
 
@@ -152,7 +153,7 @@ export function createVarLinter(
     function openBlock(block: StatementInfo) {
         const { stat } = block;
         if (isForStatement(stat)) {
-            // for iterator will be declared by the next assignement statement
+            // for iterator will be declared by the next assignment statement
         } else if (isForEachStatement(stat)) {
             // declare `for each` iterator variable
             setLocal(block, stat.item, VarRestriction.Iterator);
