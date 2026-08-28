@@ -34,12 +34,6 @@ permissions:
 jobs:
   release:
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    env:
-      # Needed by every npm step, to read @plexinc dependencies as well as to
-      # publish. Setting it per step is easy to get wrong: a fork that depends
-      # on another @plexinc package cannot even run npm ci without it.
-      #
-      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Check out xelp/main
         uses: actions/checkout@v5
@@ -99,6 +93,12 @@ jobs:
       #
       - name: Fail if this version is already published
         env:
+          # Only the three steps that talk to the registry get the token: this
+          # one, the install, and the publish. Building, linting, testing and
+          # packing do not reach the network, so they do not need it. Add it to
+          # any new step that runs npm against the registry.
+          #
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SCOPED_NAME: ${{ steps.release.outputs.scoped_name }}
           VERSION: ${{ steps.release.outputs.version }}
         run: |
@@ -113,6 +113,8 @@ jobs:
       # release that the TypeScript build cannot import.
       #
       - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm ci
 
       - name: Build
@@ -145,6 +147,8 @@ jobs:
 
       - name: Publish to GitHub Packages
         if: ${{ !inputs.dryRun }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm publish
 
       - name: Pack without publishing
