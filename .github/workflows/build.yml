@@ -8,6 +8,11 @@ on:
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
+    # npm ci reads @plexinc packages, so do not rely on the repository
+    # default, which an organization can tighten without warning.
+    permissions:
+      contents: read
+      packages: read
     env:
       #hardcode the coveralls token...it's not overly important to protect, and github actions won't allow forks to work with coveralls otherwise
       COVERALLS_REPO_TOKEN: "xTzWrR5HfbescAFnSnVXmWsVVMYglUMZi"
