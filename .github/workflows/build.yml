@@ -8,6 +8,11 @@ on:
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
+    # npm ci reads @plexinc packages, so do not rely on the repository
+    # default, which an organization can tighten without warning.
+    permissions:
+      contents: read
+      packages: read
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
