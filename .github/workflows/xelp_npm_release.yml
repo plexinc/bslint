@@ -114,7 +114,12 @@ jobs:
       #
       - name: Install dependencies
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Dependencies can live in another repo's package, and a repository's
+          # own GITHUB_TOKEN cannot read those, so prefer the organization token.
+          # The fallback keeps this working in a fork that has no @plexinc
+          # dependencies, where the repo token is enough.
+          #
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: npm ci
 
       - name: Build

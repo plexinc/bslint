@@ -37,7 +37,7 @@ jobs:
 
       - name: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: npm ci
       - run: npm version "$BUILD_VERSION" --no-git-tag-version
       - run: npm pack
