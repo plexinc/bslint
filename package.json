@@ -49,7 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
     "audit-ci": "^7.1.0",
-    "brighterscript": "^0.73.3",
+    "brighterscript": "npm:@plexinc/brighterscript@^0.73.202610116",
     "chai": "^4.3.6",
     "eslint": "^7.7.0",
     "mocha": "^10.8.2",
