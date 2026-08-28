@@ -13,6 +13,8 @@ jobs:
       - uses: actions/setup-node@master
         with:
           node-version: "14.19.0"
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@plexinc'
       # Get a bot token so the bot's name shows up on all our actions
       - name: Get Token From roku-ci-token Application
         uses: tibdex/github-app-token@v1
@@ -33,7 +35,10 @@ jobs:
           echo "BUILD_VERSION=$BUILD_VERSION" >> $GITHUB_ENV
           echo "ARTIFACT_URL=$ARTIFACT_URL" >> $GITHUB_ENV
 
-      - run: npm ci
+      - name: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm ci
       - run: npm version "$BUILD_VERSION" --no-git-tag-version
       - run: npm pack
 
